@@ -45,26 +45,27 @@
 * Macros
 *******************************************************************************/
 
-#ifdef  TARGET_KIT_XMC14_BOOT_001
+#if (UC_SERIES == XMC14)
 #define EXTERNAL_INPUT_SIGNAL_PIN     ERU0_ETL1_INPUTA_P2_5
 #define ERU_GROUP_ETL_CHANNEL         ERU0_ETL1
 #define ERU_GROUP_OGU_CHANNEL         ERU0_OGU0
 #define INTERRUPT_PRIORITY_NODE_ID    IRQ3_IRQn
 #define INTERRUPT_EVENT_PRIORITY      (3U)
 #define ERU_EXTERNAL_EVENT_HANDLER    IRQ_Hdlr_3
+#define CYCLE_DELAY_COUNT             (10000000U)
 #endif
 
-#ifdef  TARGET_KIT_XMC47_RELAX_V1
+#if (UC_SERIES == XMC47)
 #define EXTERNAL_INPUT_SIGNAL_PIN     ERU1_ETL1_INPUTA_P1_15
 #define ERU_GROUP_ETL_CHANNEL         ERU1_ETL1
 #define ERU_GROUP_OGU_CHANNEL         ERU1_OGU0
 #define INTERRUPT_PRIORITY_NODE_ID    ERU1_0_IRQn
 #define INTERRUPT_EVENT_PRIORITY      (63U)
 #define ERU_EXTERNAL_EVENT_HANDLER    IRQ_Hdlr_5
+#define CYCLE_DELAY_COUNT             (50000000U)
 #endif
 
 #define ENABLE_DEEP_SLEEP_MODE        (0U)
-#define CYCLE_DELAY_COUNT             (20000000U)
 
 /*******************************************************************************
 * Data Structure
@@ -167,25 +168,25 @@ int main(void)
     /*Initializes the selected ERU_OGUy channel with the configuration structure*/
     XMC_ERU_OGU_Init(ERU_GROUP_OGU_CHANNEL, &button_event_detection_config);
 
-#ifdef TARGET_KIT_XMC14_BOOT_001
+    #if (UC_SERIES == XMC14)
     /*Set Priority for IRQ*/
     NVIC_SetPriority(INTERRUPT_PRIORITY_NODE_ID,INTERRUPT_EVENT_PRIORITY);
-#endif
+    #endif
 
-#ifdef TARGET_KIT_XMC47_RELAX_V1
+    #if (UC_SERIES == XMC47)
     /*Set Priority for IRQ*/
     NVIC_SetPriority(INTERRUPT_PRIORITY_NODE_ID,NVIC_EncodePriority(NVIC_GetPriorityGrouping(),INTERRUPT_EVENT_PRIORITY, 0));
-#endif
+    #endif
 
     /*Enable the Interrupt*/
     NVIC_EnableIRQ(INTERRUPT_PRIORITY_NODE_ID);
 
     /*Enable the sleep or deep sleep mode*/
-#if ENABLE_DEEP_SLEEP_MODE == 1
+    #if ENABLE_DEEP_SLEEP_MODE == 1
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-#else
+    #else
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
-#endif
+    #endif
 
     /*Enable sleep-on-exit feature, Immediately enter sleep mode after execution of exception handlers*/
     SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
